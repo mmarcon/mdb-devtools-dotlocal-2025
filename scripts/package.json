@@ -1,0 +1,16 @@
+{
+  "name": "scripts",
+  "version": "1.0.0",
+  "main": "generate-embeddings.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Massimiliano Marcon <max.marcon@mongodb.com>",
+  "license": "Apache-2.0",
+  "description": "",
+  "type": "module",
+  "dependencies": {
+    "@langchain/ollama": "^0.2.0",
+    "stream-json": "^1.9.1"
+  }
+}
