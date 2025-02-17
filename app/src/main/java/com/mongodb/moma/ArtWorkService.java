@@ -13,6 +13,8 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.search.*;
+import com.mongodb.moma.embeddings.EmbeddingsService;
+
 import static com.mongodb.client.model.search.SearchOptions.searchOptions;
 import java.util.Arrays;
 
@@ -22,12 +24,16 @@ public class ArtWorkService {
   @Inject
   MongoClient mongoClient;
 
+  @Inject
+  EmbeddingsService embeddingsService;
+
   public List<Artwork> list(String query) {
     System.out.println("Query: " + query);
     List<Artwork> list = new ArrayList<>();
     MongoCursor<Document> cursor;
 
     if (query != null && !query.isEmpty()) {
+      embeddingsService.generateEmbedding(query);
       cursor = getCollection().aggregate(Arrays.asList(
           Aggregates.search(
               SearchOperator.text(SearchPath.fieldPath("Title"), query).fuzzy(),
