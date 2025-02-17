@@ -4,8 +4,8 @@ import java.util.List;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.QueryParam;
 
 @Path("/artworks")
 public class ArtworkResource {
@@ -14,12 +14,7 @@ public class ArtworkResource {
   ArtWorkService service;
 
   @GET
-  public List<Artwork> list() {
-    return service.list();
-  }
-
-  @POST
-  public void add(Artwork artwork) {
-    service.add(artwork);
+  public List<Artwork> list(@QueryParam("q") String query) {
+    return service.list(query);
   }
 }

@@ -11,6 +11,10 @@ import org.bson.Document;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
+import com.mongodb.client.model.Aggregates;
+import com.mongodb.client.model.search.*;
+import static com.mongodb.client.model.search.SearchOptions.searchOptions;
+import java.util.Arrays;
 
 @ApplicationScoped
 public class ArtWorkService {
@@ -18,9 +22,21 @@ public class ArtWorkService {
   @Inject
   MongoClient mongoClient;
 
-  public List<Artwork> list() {
+  public List<Artwork> list(String query) {
+    System.out.println("Query: " + query);
     List<Artwork> list = new ArrayList<>();
-    MongoCursor<Document> cursor = getCollection().find().limit(100).iterator();
+    MongoCursor<Document> cursor;
+
+    if (query != null && !query.isEmpty()) {
+      cursor = getCollection().aggregate(Arrays.asList(
+          Aggregates.search(
+              SearchOperator.text(SearchPath.fieldPath("Title"), query).fuzzy(),
+              searchOptions().index("artwork_index")
+          )
+      ), Document.class).iterator();
+    } else {
+      cursor = getCollection().find().limit(100).iterator();
+    }
 
     try {
       while (cursor.hasNext()) {
@@ -47,25 +63,7 @@ public class ArtWorkService {
     return list;
   }
 
-  public void add(Artwork artwork) {
-    Document document = new Document()
-      .append("Title", artwork.getTitle())
-      .append("Artist", artwork.getArtist())
-      .append("id", artwork.getId())
-      .append("Medium", artwork.getMedium())
-      .append("Date", artwork.getDate())
-      .append("Classification", artwork.getClassification())
-      .append("Dimensions", artwork.getDimensions())
-      .append("Credit", artwork.getCredit())
-      .append("Department", artwork.getDepartment())
-      .append("ObjectNumber", artwork.getObjectNumber())
-      .append("URL", artwork.getURL())
-      .append("ImageURL", artwork.getImageURL())
-      .append("ObjectID", artwork.getObjectID());
-    getCollection().insertOne(document);
-  }
-
-  private MongoCollection getCollection() {
+  private MongoCollection<Document> getCollection() {
     return mongoClient.getDatabase("artworks").getCollection("moma");
   }
 }

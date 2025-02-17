@@ -13,11 +13,25 @@
   <div class="bg-gray-800 text-white py-12 mb-6">
     <div class="container mx-auto text-center">
       <h1 class="text-4xl font-bold">Explore the Artworks of MOMA</h2>
-      <p class="mt-4 text-lg">Discover a curated selection of masterpieces from the Museum of Modern Art</p>
+        <p class="mt-4 text-lg">Discover a curated selection of masterpieces from the Museum of Modern Art</p>
     </div>
   </div>
-  <div x-data="{ artworks: [] }" x-init="fetch('/artworks')
-             .then(res => res.json()).then(data => artworks = data)" class="container mx-auto p-4">
+  <div x-data="{ 
+    artworks: [],
+    searchTerm: '',
+    search() {
+        fetch(`/artworks?q=${encodeURIComponent(this.searchTerm)}`)
+            .then(res => res.json())
+            .then(data => this.artworks = data)
+    }
+  }" x-init="search()" class="container mx-auto p-4">
+  <div class="container mx-auto px-4 mb-8">
+    <input type="text" 
+        x-model="searchTerm" 
+        @input.debounce.300ms="search()"
+        placeholder="Search artworks..." 
+        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+    </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <template x-for="artwork in artworks" :key="artwork.objectID">
         <div class="border rounded-lg p-4 shadow-lg">
@@ -26,7 +40,9 @@
               <img :src="artwork.imageURL" alt="Artwork Image" class="w-full h-48 object-cover rounded-lg">
             </template>
             <template x-if="!artwork.imageURL">
-              <svg class="w-full h-48 object-cover rounded-lg bg-gray-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg class="w-full h-48 object-cover rounded-lg bg-gray-200" xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                 <line x1="3" y1="3" x2="21" y2="21"></line>
               </svg>
