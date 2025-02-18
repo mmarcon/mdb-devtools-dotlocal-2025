@@ -12,25 +12,51 @@
 <body>
   <div class="bg-gray-800 text-white py-12 mb-6">
     <div class="container mx-auto text-center">
-      <h1 class="text-4xl font-bold">Explore the Artworks of MOMA</h2>
-        <p class="mt-4 text-lg">Discover a curated selection of masterpieces from the Museum of Modern Art</p>
+      <h1 class="text-4xl font-bold">Explore the Artworks of MOMA</h1>
+      <p class="mt-4 text-lg">Discover a curated selection of masterpieces from the Museum of Modern Art</p>
     </div>
   </div>
   <div x-data="{ 
     artworks: [],
     searchTerm: '',
+    searchType: 'fulltext',
+    loading: false,
     search() {
-        fetch(`/artworks?q=${encodeURIComponent(this.searchTerm)}`)
+        this.loading = true;
+        fetch(`/artworks?q=${encodeURIComponent(this.searchTerm)}&type=${this.searchType}`)
             .then(res => res.json())
-            .then(data => this.artworks = data)
+            .then(data => {
+                this.artworks = data;
+                this.loading = false;
+            })
+            .catch(() => {
+                this.loading = false;
+            });
     }
-  }" x-init="search()" class="container mx-auto p-4">
-  <div class="container mx-auto px-4 mb-8">
-    <input type="text" 
-        x-model="searchTerm" 
-        @input.debounce.300ms="search()"
-        placeholder="Search artworks..." 
-        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+  }" class="container mx-auto p-4">
+    <div class="container mx-auto px-4 mb-8 flex items-center space-x-4">
+      <input type="text" 
+          x-model="searchTerm" 
+          :disabled="loading"
+          placeholder="Search artworks..." 
+          class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+      <div class="flex items-center space-x-2">
+        <label class="flex items-center">
+          <input type="radio" x-model="searchType" value="fulltext" :disabled="loading" class="form-radio">
+          <span class="ml-2">Full Text Search</span>
+        </label>
+        <label class="flex items-center">
+          <input type="radio" x-model="searchType" value="semantic" :disabled="loading" class="form-radio">
+          <span class="ml-2">Semantic Search</span>
+        </label>
+      </div>
+      <button @click="search()" :disabled="loading" class="px-4 py-2 bg-blue-500 text-white rounded-lg flex items-center">
+        <span x-show="!loading">Search</span>
+        <svg x-show="loading" class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      </button>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <template x-for="artwork in artworks" :key="artwork.objectID">

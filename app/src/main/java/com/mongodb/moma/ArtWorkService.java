@@ -7,6 +7,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -27,19 +28,39 @@ public class ArtWorkService {
   @Inject
   EmbeddingsService embeddingsService;
 
-  public List<Artwork> list(String query) {
-    System.out.println("Query: " + query);
+  private static class SearchType {
+    public static final String FULL_TEXT = "fulltext";
+    public static final String SEMANTIC = "semantic";
+  }
+
+  public List<Artwork> list(String query, String type) {
+    System.out.println("Query: " + query + "- Search Type: " + type);
     List<Artwork> list = new ArrayList<>();
     MongoCursor<Document> cursor;
 
     if (query != null && !query.isEmpty()) {
-      embeddingsService.generateEmbedding(query);
-      cursor = getCollection().aggregate(Arrays.asList(
-          Aggregates.search(
-              SearchOperator.text(SearchPath.fieldPath("Title"), query).fuzzy(),
-              searchOptions().index("artwork_index")
-          )
-      ), Document.class).iterator();
+      if (type.equals(SearchType.FULL_TEXT)) {
+        cursor = getCollection().aggregate(Arrays.asList(
+            Aggregates.search(
+                SearchOperator.text(SearchPath.fieldPath("Title"), query).fuzzy(),
+                searchOptions().index("artwork_index"))),
+            Document.class).iterator();
+      } else if (type.equals(SearchType.SEMANTIC)) {
+        List<Double> embeddings = embeddingsService.generateEmbedding(query);
+        String indexName = "semantic_search_title";
+	      FieldSearchPath fieldSearchPath = SearchPath.fieldPath("EmbeddedTitle");
+        VectorSearchOptions options = VectorSearchOptions.approximateVectorSearchOptions(200);
+        List<Bson> pipeline = Arrays.asList(
+          Aggregates.vectorSearch(
+           fieldSearchPath,
+           embeddings,
+           indexName,
+           200,
+           options));
+           cursor = getCollection().aggregate(pipeline, Document.class).iterator();
+      } else {
+        cursor = getCollection().find().limit(100).iterator();
+      }
     } else {
       cursor = getCollection().find().limit(100).iterator();
     }
@@ -70,6 +91,6 @@ public class ArtWorkService {
   }
 
   private MongoCollection<Document> getCollection() {
-    return mongoClient.getDatabase("artworks").getCollection("moma");
+    return mongoClient.getDatabase("artworks").getCollection("moma_embedded");
   }
 }

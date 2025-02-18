@@ -14,7 +14,7 @@ public class ArtworkResource {
   ArtWorkService service;
 
   @GET
-  public List<Artwork> list(@QueryParam("q") String query) {
-    return service.list(query);
+  public List<Artwork> list(@QueryParam("q") String query, @QueryParam("type") String type) {
+    return service.list(query, type);
   }
 }
