@@ -30,10 +30,18 @@ jobs:
           curl -fsSL https://ollama.com/install.sh | sh
           ollama pull mxbai-embed-large
 
-      - name: check test data
+      - name: install tooling
         run: |
           curl --output mongosh.deb https://downloads.mongodb.com/compass/mongodb-mongosh_2.3.9_amd64.deb
           sudo dpkg -i mongosh.deb
+          curl --output mongodb-database-tools.deb https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2404-x86_64-100.11.0.deb
+          sudo dpkg -i mongodb-database-tools.deb
+
+      - name: seed database
+        run: |
+          curl --output moma_embedded.archive -L https://github.com/mmarcon/mdb-devtools-dotlocal-2025/releases/download/no-tag/moma_embedded_mini.archive
+          mongorestore --uri='mongodb://localhost:27317/?directConnection=true' --archive=moma_embedded.archive
+          mongosh 'mongodb://localhost:27317/?directConnection=true' initdb/01-seed.js
           mongosh 'mongodb://localhost:27317/?directConnection=true' --eval 'show dbs'
 
       - name: run tests
