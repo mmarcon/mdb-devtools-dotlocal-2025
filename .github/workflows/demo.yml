@@ -41,7 +41,7 @@ jobs:
         run: |
           curl --output moma_embedded.archive -L https://github.com/mmarcon/mdb-devtools-dotlocal-2025/releases/download/no-tag/moma_embedded_mini.archive
           mongorestore --uri='mongodb://localhost:27317/?directConnection=true' --archive=moma_embedded.archive
-          mongosh 'mongodb://localhost:27317/?directConnection=true' initdb/01-seed.js
+          mongosh 'mongodb://localhost:27317/?directConnection=true' initdb/01-indexes.js
           mongosh 'mongodb://localhost:27317/?directConnection=true' --eval 'show dbs'
 
       - name: run tests
