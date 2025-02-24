@@ -14,13 +14,6 @@ then
     exit 1
 fi
 
-# Check if jq is installed
-if ! command -v jq &> /dev/null
-then
-    echo "jq could not be found. Please install jq and try again."
-    exit 1
-fi
-
 # Create the local deployment
 atlas deployments setup devtools-dotlocal-2 \
   --type local \
@@ -28,24 +21,3 @@ atlas deployments setup devtools-dotlocal-2 \
   --port 27417 \
   --initdb ./initdb \
   --force
-
-# # Grab the connection string
-# connection_string=$(atlas deployments connect devtools-dotlocal --connectWith connectionString)
-
-# # Generate JSON array with one object
-# json_array=$(jq -n --arg connStr $connection_string \
-# '[
-#   {
-#     "name": {
-#       "type": "string",
-#       "description": "devtools-dotlocal"
-#     },
-#     "connectionString": {
-#       "type": "string",
-#       "description": $connStr
-#     }
-#   }
-# ]')
-
-# # Print the JSON array
-# echo "$json_array"
