@@ -1,13 +1,7 @@
 #!/bin/bash
 
-FULL_PATH_TO_SCRIPT="$(realpath "${BASH_SOURCE[0]}")"
-CURRENT_DIR="$(dirname "$FULL_PATH_TO_SCRIPT")"
+curl -o /tmp/moma_embedded.archive -L https://github.com/mmarcon/mdb-devtools-dotlocal-2025/releases/download/no-tag/moma_embedded.archive
 
-CONNECTION_STRING=mongodb://localhost:27017/?directConnection=true
-
-mongoimport \
-  --uri $CONNECTION_STRING \
-  --collection=moma \
-  --db=artworks \
-  --jsonArray \
-  --file="${CURRENT_DIR}/data/Artworks.json" > /tmp/import-log.txt 2>&1
+mongorestore \
+  --port 27017 \
+  --archive=/tmp/moma_embedded.archive > /tmp/restore-log.txt 2>&1

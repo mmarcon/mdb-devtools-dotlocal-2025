@@ -168,4 +168,5 @@ dist
 .svelte-kit
 
 initdb/data/*.json
+initdb/data/*.archive
 .vscode

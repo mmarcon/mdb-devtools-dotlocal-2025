@@ -28,7 +28,7 @@ const processItem = async (item) => {
       const embedding = await embeddings.embedQuery(item.value.Title);
       item.value.EmbeddedTitle = embedding;
       data.push(item.value);
-      // await collection.insertOne(item.value);
+      await collection.insertOne(item.value);
     } catch (err) {
       console.error('Error generating embedding:', err);
     }

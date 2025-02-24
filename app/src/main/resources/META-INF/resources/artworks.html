@@ -21,6 +21,9 @@
     searchTerm: '',
     searchType: 'fulltext',
     loading: false,
+    init() {
+        this.search();
+    },
     search() {
         this.loading = true;
         fetch(`/artworks?q=${encodeURIComponent(this.searchTerm)}&type=${this.searchType}`)

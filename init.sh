@@ -22,10 +22,10 @@ then
 fi
 
 # Create the local deployment
-atlas deployments setup devtools-dotlocal \
+atlas deployments setup devtools-dotlocal-2 \
   --type local \
   --mdbVersion 8.0 \
-  --port 27317 \
+  --port 27417 \
   --initdb ./initdb \
   --force
 

@@ -1,0 +1,37 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongodb/mongodb-atlas-local:8.0
+        volumes:
+          - ./initdb.ci:/docker-entrypoint-initdb.d
+        ports:
+          - 27317:27017
+      ollama:
+        image: ollama
+        ports:
+          - 11434:11434
+      
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: pull embeddings model
+        run: |
+          curl -fsSL https://ollama.com/install.sh | sh
+          ollama pull mxbai-embed-large
+
+      - name: run tests
+        run: |
+          cd app
+          ./mvnw verify
+

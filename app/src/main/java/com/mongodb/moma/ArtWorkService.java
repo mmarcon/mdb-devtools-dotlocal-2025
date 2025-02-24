@@ -62,6 +62,7 @@ public class ArtWorkService {
         cursor = getCollection().find().limit(100).iterator();
       }
     } else {
+      System.out.println("Query is empty");
       cursor = getCollection().find().limit(100).iterator();
     }
 
