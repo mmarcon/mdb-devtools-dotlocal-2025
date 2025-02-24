@@ -16,7 +16,7 @@ jobs:
         ports:
           - 27317:27017
       ollama:
-        image: ollama
+        image: ollama/ollama
         ports:
           - 11434:11434
       
