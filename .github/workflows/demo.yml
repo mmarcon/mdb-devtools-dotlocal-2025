@@ -30,6 +30,12 @@ jobs:
           curl -fsSL https://ollama.com/install.sh | sh
           ollama pull mxbai-embed-large
 
+      - name: check test data
+        run: |
+          curl --output mongosh.deb https://downloads.mongodb.com/compass/mongodb-mongosh_2.3.9_amd64.deb
+          sudo dpkg -i mongosh.deb
+          mongosh 'mongodb://localhost:27317/?directConnection=true' --eval 'show dbs'
+
       - name: run tests
         run: |
           cd app
