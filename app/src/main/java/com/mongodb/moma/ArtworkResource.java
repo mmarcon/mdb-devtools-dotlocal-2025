@@ -14,7 +14,11 @@ public class ArtworkResource {
   ArtWorkService service;
 
   @GET
-  public List<Artwork> list(@QueryParam("q") String query, @QueryParam("type") String type) {
-    return service.list(query, type);
+  public List<Artwork> list(
+      @QueryParam("q") String query,
+      @QueryParam("type") String type,
+      @QueryParam("department") String department,
+      @QueryParam("artist") String artist) {
+    return service.list(query, type, department, artist);
   }
 }

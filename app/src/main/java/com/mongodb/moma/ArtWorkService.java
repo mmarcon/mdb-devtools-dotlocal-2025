@@ -14,6 +14,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.search.*;
+import com.mongodb.client.model.Filters;
 import com.mongodb.moma.embeddings.EmbeddingsService;
 
 import static com.mongodb.client.model.search.SearchOptions.searchOptions;
@@ -33,35 +34,56 @@ public class ArtWorkService {
     public static final String SEMANTIC = "semantic";
   }
 
-  public List<Artwork> list(String query, String type) {
+  private MongoCursor<Document> fullTextSearch(String query) {
+    return getCollection().aggregate(Arrays.asList(
+        Aggregates.search(
+            SearchOperator.text(SearchPath.fieldPath("Title"), query).fuzzy(),
+            searchOptions().index("artwork_index"))),
+        Document.class).iterator();
+  }
+  
+  private MongoCursor<Document> semanticSearch(String query) {
+    List<Double> embeddings = embeddingsService.generateEmbedding(query);
+    String indexName = "semantic_search_title";
+    FieldSearchPath fieldSearchPath = SearchPath.fieldPath("EmbeddedTitle");
+    VectorSearchOptions options = VectorSearchOptions.approximateVectorSearchOptions(200);
+    List<Bson> pipeline = Arrays.asList(
+      Aggregates.vectorSearch(
+        fieldSearchPath,
+        embeddings,
+        indexName,
+        200,
+        options));
+    return getCollection().aggregate(pipeline, Document.class).iterator();
+  }
+
+  private MongoCursor<Document> getArtworkByDepartmentAndArtist(String department, String artist) {
+    return getCollection().find(Filters.and(
+      Filters.eq("Department", department),
+      Filters.eq("Artist", artist)
+    )).iterator();
+  }
+
+  public List<Artwork> list(String query, String type, String department, String artist) {
     System.out.println("Query: " + query + "- Search Type: " + type);
     List<Artwork> list = new ArrayList<>();
     MongoCursor<Document> cursor;
 
     if (query != null && !query.isEmpty()) {
       if (type.equals(SearchType.FULL_TEXT)) {
-        cursor = getCollection().aggregate(Arrays.asList(
-            Aggregates.search(
-                SearchOperator.text(SearchPath.fieldPath("Title"), query).fuzzy(),
-                searchOptions().index("artwork_index"))),
-            Document.class).iterator();
+        cursor = fullTextSearch(query);
       } else if (type.equals(SearchType.SEMANTIC)) {
-        List<Double> embeddings = embeddingsService.generateEmbedding(query);
-        String indexName = "semantic_search_title";
-	      FieldSearchPath fieldSearchPath = SearchPath.fieldPath("EmbeddedTitle");
-        VectorSearchOptions options = VectorSearchOptions.approximateVectorSearchOptions(200);
-        List<Bson> pipeline = Arrays.asList(
-          Aggregates.vectorSearch(
-           fieldSearchPath,
-           embeddings,
-           indexName,
-           200,
-           options));
-           cursor = getCollection().aggregate(pipeline, Document.class).iterator();
+           cursor = semanticSearch(query);
       } else {
         cursor = getCollection().find().limit(100).iterator();
       }
-    } else {
+    }
+    
+    else if (department != null && artist != null) {
+      cursor = getArtworkByDepartmentAndArtist(department, artist);
+    }
+    
+    else {
       System.out.println("Query is empty");
       cursor = getCollection().find().limit(100).iterator();
     }
