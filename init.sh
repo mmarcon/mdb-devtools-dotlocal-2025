@@ -14,10 +14,17 @@ then
     exit 1
 fi
 
-# Check if jq is installed
-if ! command -v jq &> /dev/null
+# Check if ollama is installed
+if ! command -v ollama &> /dev/null
 then
-    echo "jq could not be found. Please install jq and try again."
+    echo "ollama could not be found. Please install ollama and try again."
+    exit 1
+fi
+
+# Check if Java is installed
+if ! command -v java &> /dev/null
+then
+    echo "Java could not be found. Please install Java and try again."
     exit 1
 fi
 
