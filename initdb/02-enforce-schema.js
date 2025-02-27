@@ -8,7 +8,7 @@ const ARTWORKS_MOMA_SCHEMA = {
       'Title',
       'URL'
     ],
-    additionalProperties: true,
+    additionalProperties: false,
     properties: {
       _id: {
         bsonType: 'objectId'
