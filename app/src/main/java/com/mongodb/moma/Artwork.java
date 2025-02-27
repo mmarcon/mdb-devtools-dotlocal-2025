@@ -1,5 +1,6 @@
 package com.mongodb.moma;
 
+import java.util.List;
 import java.util.Objects;
 
 public class Artwork {
@@ -10,12 +11,12 @@ public class Artwork {
   private String Date;
   private String Classification;
   private String Dimensions;
-  private String Credit;
+  private String CreditLine;
   private String Department;
-  private String ObjectNumber;
   private String URL;
   private String ImageURL;
   private int ObjectID;
+  private List<Double> EmbeddedTitle;
 
   public Artwork() {
   }
@@ -76,12 +77,12 @@ public class Artwork {
     Dimensions = dimensions;
   }
 
-  public String getCredit() {
-    return Credit;
+  public String getCreditLine() {
+    return CreditLine;
   }
 
-  public void setCredit(String credit) {
-    Credit = credit;
+  public void setCreditLine(String creditLine) {
+    CreditLine = creditLine;
   }
 
   public String getDepartment() {
@@ -90,14 +91,6 @@ public class Artwork {
 
   public void setDepartment(String department) {
     Department = department;
-  }
-
-  public String getObjectNumber() {
-    return ObjectNumber;
-  }
-
-  public void setObjectNumber(String objectNumber) {
-    ObjectNumber = objectNumber;
   }
 
   public String getURL() {
@@ -138,5 +131,13 @@ public class Artwork {
 
   public Object getObjectID() {
     return ObjectID;
+  }
+
+  public void setEmbeddedTitle(List<Double> embeddedTitle) {
+    EmbeddedTitle = embeddedTitle;
+  }
+
+  public List<Double> getEmbeddedTitle() {
+    return EmbeddedTitle;
   }
 }

@@ -9,11 +9,13 @@ import jakarta.inject.Inject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
+import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.search.*;
+import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.model.Filters;
 import com.mongodb.moma.embeddings.EmbeddingsService;
 
@@ -99,9 +101,8 @@ public class ArtWorkService {
         artwork.setDate(document.getString("Date"));
         artwork.setClassification(document.getString("Classification"));
         artwork.setDimensions(document.getString("Dimensions"));
-        artwork.setCredit(document.getString("Credit"));
+        artwork.setCreditLine(document.getString("CreditLine"));
         artwork.setDepartment(document.getString("Department"));
-        artwork.setObjectNumber(document.getString("ObjectNumber"));
         artwork.setURL(document.getString("URL"));
         artwork.setImageURL(document.getString("ImageURL"));
         artwork.setObjectID(document.getInteger("ObjectID"));
@@ -116,4 +117,33 @@ public class ArtWorkService {
   private MongoCollection<Document> getCollection() {
     return mongoClient.getDatabase("artworks").getCollection("moma_embedded");
   }
+
+	public Artwork add(Artwork artwork) {
+    List<Double> embeddedTitle = embeddingsService.generateEmbedding(artwork.getTitle());
+
+    Document document = new Document()
+      .append("Title", artwork.getTitle())
+      .append("Artist", Arrays.asList(artwork.getArtist()))
+      .append("Medium", artwork.getMedium())
+      .append("Date", artwork.getDate())
+      .append("Classification", artwork.getClassification())
+      .append("Dimensions", artwork.getDimensions())
+      .append("CreditLine", artwork.getCreditLine())
+      .append("Department", artwork.getDepartment())
+      .append("URL", artwork.getURL())
+      .append("ImageURL", artwork.getImageURL())
+      .append("ObjectID", artwork.getObjectID())
+      .append("EmbeddedTitle", embeddedTitle);
+
+    
+    try {
+      InsertOneResult result = getCollection().insertOne(document);
+      artwork.setId(result.getInsertedId().toString());
+      return artwork;
+    } catch (MongoWriteException e) {
+      System.out.println("Error: " + e.getMessage());
+      return null;
+    }
+    
+	}
 }
