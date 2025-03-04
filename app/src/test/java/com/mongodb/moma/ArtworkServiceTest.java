@@ -5,6 +5,7 @@ import io.quarkus.test.junit.TestProfile;
 
 import org.assertj.core.api.Assertions;
 import org.bson.Document;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import jakarta.inject.Inject;
 
@@ -14,6 +15,7 @@ import com.mongodb.utils.TestUtils;
 
 @QuarkusTest
 @TestProfile(StgProfile.class)
+@Tag("stg")
 public class ArtworkServiceTest {
   @Inject
   ArtWorkService artworkService;
