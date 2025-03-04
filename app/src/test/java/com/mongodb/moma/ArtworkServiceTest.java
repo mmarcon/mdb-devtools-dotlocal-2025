@@ -49,7 +49,9 @@ public class ArtworkServiceTest {
     long endTime = System.nanoTime();
     long durationMs = (endTime - startTime) / 1_000_000;
     Assertions.assertThat(document.getString("Title")).isEqualTo(title);
-    Assertions.assertThat(durationMs).isLessThan(200);
+    Assertions.assertThat(durationMs)
+      .withFailMessage("Query should execute in less than 200ms but took %dms", durationMs)
+      .isLessThan(200);
     cursor.close();
   }
 

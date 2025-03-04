@@ -1,0 +1,32 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      ollama:
+        image: ollama/ollama
+        ports:
+          - 11434:11434
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: pull embeddings model
+        run: |
+          curl -fsSL https://ollama.com/install.sh | sh
+          ollama pull mxbai-embed-large
+
+      - name: run tests
+        env:
+          ARTWORKS_STG_CONN_STRING: ${{ secrets.ARTWORKS_STG_CONN_STRING }}
+        run: |
+          cd app
+          ./mvnw verify -Dgroups=stg
+
