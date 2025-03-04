@@ -36,7 +36,7 @@ public class ArtWorkService {
     public static final String SEMANTIC = "semantic";
   }
 
-  private MongoCursor<Document> fullTextSearch(String query) {
+  protected MongoCursor<Document> fullTextSearch(String query) {
     return getCollection().aggregate(Arrays.asList(
         Aggregates.search(
             SearchOperator.text(SearchPath.fieldPath("Title"), query).fuzzy(),
@@ -44,7 +44,7 @@ public class ArtWorkService {
         Document.class).iterator();
   }
   
-  private MongoCursor<Document> semanticSearch(String query) {
+  protected MongoCursor<Document> semanticSearch(String query) {
     List<Double> embeddings = embeddingsService.generateEmbedding(query);
     String indexName = "semantic_search_title";
     FieldSearchPath fieldSearchPath = SearchPath.fieldPath("EmbeddedTitle");
@@ -59,7 +59,7 @@ public class ArtWorkService {
     return getCollection().aggregate(pipeline, Document.class).iterator();
   }
 
-  private MongoCursor<Document> getArtworkByDepartmentAndArtist(String department, String artist) {
+  protected MongoCursor<Document> getArtworkByDepartmentAndArtist(String department, String artist) {
     return getCollection().find(Filters.and(
       Filters.eq("Department", department),
       Filters.eq("Artist", artist)

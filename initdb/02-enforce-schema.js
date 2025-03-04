@@ -1,162 +1,139 @@
 const ARTWORKS_MOMA_SCHEMA = {
   $jsonSchema: {
-    bsonType: 'object',
+    bsonType: "object",
     required: [
-      'Artist',
-      'Department',
-      'ObjectID',
-      'Title',
-      'URL'
+      "Artist",
+      "Department",
+      "ObjectID",
+      "Title",
+      "URL",
+      "EmbeddedTitle",
     ],
     additionalProperties: false,
     properties: {
       _id: {
-        bsonType: 'objectId'
+        bsonType: "objectId",
       },
       AccessionNumber: {
-        bsonType: 'string'
+        bsonType: "string",
       },
       Artist: {
-        bsonType: 'array',
+        bsonType: "array",
         items: {
-          bsonType: 'string'
-        }
+          bsonType: "string",
+        },
       },
       ArtistBio: {
-        bsonType: 'array',
+        bsonType: "array",
         items: {
-          bsonType: 'string'
-        }
+          bsonType: "string",
+        },
       },
       BeginDate: {
-        bsonType: 'array',
+        bsonType: "array",
         items: {
-          bsonType: 'int'
-        }
+          bsonType: "int",
+        },
       },
       Cataloged: {
-        bsonType: 'string'
+        bsonType: "string",
       },
       Classification: {
-        bsonType: 'string'
+        bsonType: "string",
       },
       ConstituentID: {
-        bsonType: 'array',
+        bsonType: "array",
         items: {
-          bsonType: 'int'
-        }
+          bsonType: "int",
+        },
       },
       CreditLine: {
-        bsonType: [
-          'string',
-          'null'
-        ]
+        bsonType: ["string", "null"],
       },
       Date: {
-        bsonType: [
-          'string',
-          'null'
-        ]
+        bsonType: ["string", "null"],
       },
       DateAcquired: {
-        bsonType: [
-          'string',
-          'null'
-        ]
+        bsonType: ["string", "null"],
       },
       Department: {
-        bsonType: 'string'
+        bsonType: "string",
       },
-      'Depth (cm)': {
-        bsonType: [
-          'int',
-          'double'
-        ]
+      "Depth (cm)": {
+        bsonType: ["int", "double"],
       },
-      'Diameter (cm)': {
-        bsonType: 'double'
+      "Diameter (cm)": {
+        bsonType: "double",
       },
       Dimensions: {
-        bsonType: [
-          'string',
-          'null'
-        ]
+        bsonType: ["string", "null"],
       },
-      'Duration (sec.)': {
-        bsonType: 'int'
+      "Duration (sec.)": {
+        bsonType: "int",
       },
       EndDate: {
-        bsonType: 'array',
+        bsonType: "array",
         items: {
-          bsonType: 'int'
-        }
+          bsonType: "int",
+        },
       },
       Gender: {
-        bsonType: 'array',
+        bsonType: "array",
         items: {
-          bsonType: 'string'
-        }
+          bsonType: "string",
+        },
       },
-      'Height (cm)': {
-        bsonType: [
-          'double',
-          'int'
-        ]
+      "Height (cm)": {
+        bsonType: ["double", "int"],
       },
       ImageURL: {
-        bsonType: [
-          'string',
-          'null'
-        ]
+        bsonType: ["string", "null"],
       },
-      'Length (cm)': {
-        bsonType: 'double'
+      "Length (cm)": {
+        bsonType: "double",
       },
       Medium: {
-        bsonType: [
-          'string',
-          'null'
-        ]
+        bsonType: ["string", "null"],
       },
       Nationality: {
-        bsonType: 'array',
+        bsonType: "array",
         items: {
-          bsonType: 'string'
-        }
+          bsonType: "string",
+        },
       },
       ObjectID: {
-        bsonType: 'int'
+        bsonType: "int",
       },
       OnView: {
-        bsonType: 'string'
+        bsonType: "string",
       },
       Title: {
-        bsonType: 'string'
+        bsonType: "string",
       },
       URL: {
-        bsonType: [
-          'string',
-          'null'
-        ]
+        bsonType: ["string", "null"],
       },
-      'Weight (kg)': {
-        bsonType: 'double'
+      "Weight (kg)": {
+        bsonType: "double",
       },
-      'Width (cm)': {
-        bsonType: [
-          'double',
-          'int'
-        ]
-      }
-    }
-  }
+      "Width (cm)": {
+        bsonType: ["double", "int"],
+      },
+      EmbeddedTitle: {
+        bsonType: "array",
+        items: {
+          bsonType: "double",
+        },
+      },
+    },
+  },
 };
 
-use('artworks');
+use("artworks");
 
 db.runCommand({
   collMod: "moma_embedded",
   validator: ARTWORKS_MOMA_SCHEMA,
-  validationLevel: "strict",  // Options: "off", "moderate", "strict"
-  validationAction: "error"   // Options: "warn", "error"
+  validationLevel: "strict", // Options: "off", "moderate", "strict"
+  validationAction: "error", // Options: "warn", "error"
 });
