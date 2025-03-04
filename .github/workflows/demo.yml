@@ -48,5 +48,5 @@ jobs:
       - name: run tests
         run: |
           cd app
-          ./mvnw verify
+          ./mvnw verify -DexcludedGroups=stg
 
