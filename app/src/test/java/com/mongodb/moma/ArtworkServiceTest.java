@@ -3,10 +3,14 @@ package com.mongodb.moma;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 
+import java.time.Duration;
+
 import org.assertj.core.api.Assertions;
 import org.bson.Document;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTimeout;
+
 import jakarta.inject.Inject;
 
 import com.mongodb.client.MongoCursor;
@@ -43,16 +47,13 @@ public class ArtworkServiceTest {
 
     artworkService.add(artwork);
 
-    long startTime = System.nanoTime();
-    MongoCursor<Document> cursor = artworkService.getArtworkByDepartmentAndArtist(department, artist);
-    Document document = cursor.next();
-    long endTime = System.nanoTime();
-    long durationMs = (endTime - startTime) / 1_000_000;
+    Document document = assertTimeout(Duration.ofMillis(200), () -> {
+      MongoCursor<Document> cursor = artworkService.getArtworkByDepartmentAndArtist(department, artist);
+      Document doc = cursor.next();
+      cursor.close();
+      return doc;
+    });
     Assertions.assertThat(document.getString("Title")).isEqualTo(title);
-    Assertions.assertThat(durationMs)
-      .withFailMessage("Query should execute in less than 200ms but took %dms", durationMs)
-      .isLessThan(200);
-    cursor.close();
   }
 
 }
