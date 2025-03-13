@@ -60,10 +60,8 @@ public class ArtWorkService {
   }
 
   protected MongoCursor<Document> getArtworkByDepartmentAndArtist(String department, String artist) {
-    return getCollection().find(Filters.and(
-      Filters.eq("Department", department),
-      Filters.eq("Artist", artist)
-    )).iterator();
+    // TODO: Implement this method
+    return null;
   }
 
   public List<Artwork> list(String query, String type, String department, String artist) {

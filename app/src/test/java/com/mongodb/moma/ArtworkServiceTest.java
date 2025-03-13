@@ -7,6 +7,7 @@ import java.time.Duration;
 
 import org.assertj.core.api.Assertions;
 import org.bson.Document;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTimeout;
@@ -25,6 +26,7 @@ public class ArtworkServiceTest {
   ArtWorkService artworkService;
 
   @Test
+  @Disabled
   public void getArtworkByDepartmentAndArtistTest() {
     Artwork artwork = new Artwork();
 
