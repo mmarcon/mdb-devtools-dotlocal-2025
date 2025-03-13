@@ -43,25 +43,26 @@ public class ArtWorkService {
             searchOptions().index("artwork_index"))),
         Document.class).iterator();
   }
-  
+
   protected MongoCursor<Document> semanticSearch(String query) {
     List<Double> embeddings = embeddingsService.generateEmbedding(query);
     String indexName = "semantic_search_title";
     FieldSearchPath fieldSearchPath = SearchPath.fieldPath("EmbeddedTitle");
     VectorSearchOptions options = VectorSearchOptions.approximateVectorSearchOptions(200);
     List<Bson> pipeline = Arrays.asList(
-      Aggregates.vectorSearch(
-        fieldSearchPath,
-        embeddings,
-        indexName,
-        200,
-        options));
+        Aggregates.vectorSearch(
+            fieldSearchPath,
+            embeddings,
+            indexName,
+            200,
+            options));
     return getCollection().aggregate(pipeline, Document.class).iterator();
   }
 
   protected MongoCursor<Document> getArtworkByDepartmentAndArtist(String department, String artist) {
-    // TODO: Implement this method
-    return null;
+    return getCollection().find(Filters.and(
+        Filters.eq("Department", department),
+        Filters.eq("Artist", artist))).iterator();
   }
 
   public List<Artwork> list(String query, String type, String department, String artist) {
@@ -73,16 +74,16 @@ public class ArtWorkService {
       if (type.equals(SearchType.FULL_TEXT)) {
         cursor = fullTextSearch(query);
       } else if (type.equals(SearchType.SEMANTIC)) {
-           cursor = semanticSearch(query);
+        cursor = semanticSearch(query);
       } else {
         cursor = getCollection().find().limit(100).iterator();
       }
     }
-    
+
     else if (department != null && artist != null) {
       cursor = getArtworkByDepartmentAndArtist(department, artist);
     }
-    
+
     else {
       System.out.println("Query is empty");
       cursor = getCollection().find().limit(100).iterator();
@@ -116,24 +117,23 @@ public class ArtWorkService {
     return mongoClient.getDatabase("artworks").getCollection("moma_embedded");
   }
 
-	public Artwork add(Artwork artwork) {
+  public Artwork add(Artwork artwork) {
     List<Double> embeddedTitle = embeddingsService.generateEmbedding(artwork.getTitle());
 
     Document document = new Document()
-      .append("Title", artwork.getTitle())
-      .append("Artist", Arrays.asList(artwork.getArtist()))
-      .append("Medium", artwork.getMedium())
-      .append("Date", artwork.getDate())
-      .append("Classification", artwork.getClassification())
-      .append("Dimensions", artwork.getDimensions())
-      .append("CreditLine", artwork.getCreditLine())
-      .append("Department", artwork.getDepartment())
-      .append("URL", artwork.getURL())
-      .append("ImageURL", artwork.getImageURL())
-      .append("ObjectID", artwork.getObjectID())
-      .append("EmbeddedTitle", embeddedTitle);
+        .append("Title", artwork.getTitle())
+        .append("Artist", Arrays.asList(artwork.getArtist()))
+        .append("Medium", artwork.getMedium())
+        .append("Date", artwork.getDate())
+        .append("Classification", artwork.getClassification())
+        .append("Dimensions", artwork.getDimensions())
+        .append("CreditLine", artwork.getCreditLine())
+        .append("Department", artwork.getDepartment())
+        .append("URL", artwork.getURL())
+        .append("ImageURL", artwork.getImageURL())
+        .append("ObjectID", artwork.getObjectID())
+        .append("EmbeddedTitle", embeddedTitle);
 
-    
     try {
       InsertOneResult result = getCollection().insertOne(document);
       artwork.setId(result.getInsertedId().toString());
@@ -142,6 +142,6 @@ public class ArtWorkService {
       System.out.println("Error: " + e.getMessage());
       return null;
     }
-    
-	}
+
+  }
 }
