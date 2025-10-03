@@ -64,3 +64,5 @@ Currently implemented are:
 ### Good queries for demo
 
 * `experiments with colors` to show the difference between full-text search and semantic search
+
+PR last updated: 2025-10-03

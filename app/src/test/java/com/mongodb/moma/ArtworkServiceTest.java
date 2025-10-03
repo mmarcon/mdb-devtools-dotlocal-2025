@@ -26,7 +26,6 @@ public class ArtworkServiceTest {
   ArtWorkService artworkService;
 
   @Test
-  @Disabled
   public void getArtworkByDepartmentAndArtistTest() {
     Artwork artwork = new Artwork();
 
